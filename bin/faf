@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+require 'gli'
+require 'faf'
+
+class App
+  extend GLI::App
+
+  program_desc 'Find active GitHub forks.'
+  version Faf::VERSION
+
+  switch %i[v verbose], desc: 'Produce verbose output.', default_value: false
+  flag %i[t token], desc: 'GitHub access token.', default_value: ENV['GITHUB_ACCESS_TOKEN']
+  flag %i[u username], desc: 'GitHub username.', default_value: Faf::Auth.instance.username
+
+  arguments :strict
+  subcommand_option_handling :normal
+
+  pre do |global_options, _command, options, _args|
+    options = global_options.dup
+    token = options.delete(:token) || Faf::Auth.instance.token
+    $verbose = global_options[:verbose]
+    puts "Using token '#{token}'" if $verbose
+    $connection = Faf::Connection.initialize!(token, options)
+  end
+
+  default_command :help
+
+  desc 'Show active GitHub forks.'
+  arg 'repo'
+  command :forks do |c|
+    c.action do |_global_options, options, args|
+      repo = args.first
+      puts "Exploring forks of '#{repo}' ..." if $verbose
+      github_repo = Faf::Repo.new(repo, options)
+      puts "Found #{github_repo.fork_count} forks ..." if $verbose
+      github_repo.forks.each do |f|
+        puts f
+      end
+      exit_now! nil, 0
+    end
+  end
+
+  on_error do |e|
+    warn "Error: #{e.message}"
+    warn '  ' + e.backtrace.join("\n  ") if $verbose
+    false
+  end
+end
+
+exit App.run(ARGV)
