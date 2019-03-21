@@ -16,8 +16,21 @@ gem install faf
 
 The `forks` command shows github forks.
 
-```
+```bash
 $ faf forks dblock/fue
+
+https://github.com/zacklayton/fue (21 days and 7 hours ago)
+https://github.com/lhmzhou/fue (25 days and 4 hours ago)
+```
+
+Limit the number of forks with `--max`.
+
+```bash
+$ faf forks --max=3 dblock/slack-gamebot
+
+https://github.com/tarikstafford/slack-gamebot (18 days ago)
+https://github.com/dersam/slack-gamebot (30 days and 4 hours ago)
+https://github.com/ccadoret/slack-gamebot (50 days and 3 hours ago)
 ```
 
 #### Get Help
