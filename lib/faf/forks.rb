@@ -24,7 +24,7 @@ module Faf
       query = <<-GRAPHQL
         query($owner: String!, $name: String!, $cursor: String) {
           repository(owner: $owner, name: $name) {
-            forks(first: 10, after: $cursor) {
+            forks(first: 100, after: $cursor, orderBy: { field: PUSHED_AT, direction: DESC }) {
               edges {
                 cursor
                 node {
@@ -55,7 +55,7 @@ module Faf
         end
       end
 
-      forks.sort_by(&:pushed_at).reverse
+      forks
     end
   end
 end
